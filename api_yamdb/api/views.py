@@ -4,12 +4,15 @@ from django.shortcuts import get_object_or_404
 from rest_framework import mixins, viewsets, permissions, status, filters
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (
+    IsAuthenticated, IsAuthenticatedOrReadOnly
+)
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.parsers import JSONParser, FormParser, MultiPartParser, BaseParser
-from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.parsers import (
+    JSONParser, FormParser, MultiPartParser, BaseParser
+)
 from reviews.models import User, Title, Category, Genre, Review, Comment
 from .permissions import AdminOnly, IsAuthorOrModeratorOrAdmin
 from .serializers import (
@@ -21,8 +24,8 @@ from .serializers import (
 
 
 class UsersViewSet(viewsets.ModelViewSet):
-
     """ViewSet для управления пользователями."""
+
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
     queryset = User.objects.all()
     serializer_class = UsersSerializer
@@ -54,8 +57,8 @@ class UsersViewSet(viewsets.ModelViewSet):
 
 
 class APISignup(APIView):
-
     """    API эндпоинт для регистрации новых пользователей."""
+
     permission_classes = (permissions.AllowAny,)
 
     @staticmethod
@@ -86,8 +89,8 @@ class APISignup(APIView):
 
 
 class APIGetToken(APIView):
-
     """Эндпоинт для получения токена."""
+
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
@@ -110,8 +113,8 @@ class APIGetToken(APIView):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-
     """ViewSet для управления произведениями."""
+
     queryset = Title.objects.all()
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', 'year', 'category__slug', 'genre__slug']
@@ -165,8 +168,8 @@ class CategoryViewSet(mixins.ListModelMixin,
                       mixins.DestroyModelMixin,
                       mixins.UpdateModelMixin,
                       viewsets.GenericViewSet):
-
     """ViewSet для управления категориями произведений."""
+
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     lookup_field = 'slug'
@@ -182,8 +185,8 @@ class CategoryViewSet(mixins.ListModelMixin,
 
 
 class GenreViewSet(viewsets.ModelViewSet):
-
     """ViewSet для управления жанрами произведений."""
+
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     lookup_field = 'slug'
@@ -206,11 +209,13 @@ class GenreViewSet(viewsets.ModelViewSet):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
-
     """ViewSet для управления отзывами на произведения."""
-    http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options'] 
+
+    http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
     serializer_class = ReviewSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsAuthorOrModeratorOrAdmin]
+    permission_classes = [
+        IsAuthenticatedOrReadOnly, IsAuthorOrModeratorOrAdmin
+    ]
 
     def get_queryset(self):
         title_id = self.kwargs['title_id']
@@ -233,8 +238,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
-
     """ViewSet для управления комментариями к отзывам."""
+
     http_method_names = ['get', 'post', 'patch', 'delete']
     serializer_class = CommentSerializer
     permission_classes = [
