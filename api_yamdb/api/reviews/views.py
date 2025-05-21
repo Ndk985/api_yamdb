@@ -29,18 +29,9 @@ class ReviewViewSet(viewsets.ModelViewSet):
             title=title
         )
 
-    def update(self, request, *args, **kwargs):
-        if request.method == 'PUT':
-            return Response(
-                {"detail": "Метод PUT не разрешен"},
-                status=status.HTTP_405_METHOD_NOT_ALLOWED
-            )
-        return super().update(request, *args, **kwargs)
-
 
 class CommentViewSet(viewsets.ModelViewSet):
     """ViewSet для управления комментариями к отзывам."""
-
     http_method_names = ['get', 'post', 'patch', 'delete']
     serializer_class = CommentSerializer
     permission_classes = [
@@ -48,15 +39,14 @@ class CommentViewSet(viewsets.ModelViewSet):
         IsAuthenticatedOrReadOnly
     ]
 
+    def get_review(self):
+        return get_object_or_404(Review, id=self.kwargs["review_id"])
+
     def get_queryset(self):
-        review_id = self.kwargs['review_id']
-        return Comment.objects.filter(review_id=review_id)
+        return self.get_review().comments.all()
 
     def perform_create(self, serializer):
-        review = get_object_or_404(Review, id=self.kwargs['review_id'])
-        serializer.save(author=self.request.user, review=review)
-
-    def update(self, request, *args, **kwargs):
-        if request.method == 'PUT':
-            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-        return super().update(request, *args, **kwargs)
+        serializer.save(
+            author=self.request.user,
+            review=self.get_review()
+        )
