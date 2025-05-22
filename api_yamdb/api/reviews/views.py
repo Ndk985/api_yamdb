@@ -1,8 +1,7 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, status
+from rest_framework import viewsets
 from rest_framework.permissions import (IsAuthenticatedOrReadOnly)
-from rest_framework.response import Response
-from reviews.models import Title, Review, Comment
+from reviews.models import Title, Review
 from api.core.permissions import IsAuthorOrModeratorOrAdmin
 from .serializers import (
     ReviewSerializer, CommentSerializer
