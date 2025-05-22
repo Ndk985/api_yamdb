@@ -1,10 +1,11 @@
 from rest_framework import mixins, viewsets, permissions, status, filters
 from rest_framework.response import Response
 from rest_framework.parsers import (
-    JSONParser, FormParser, MultiPartParser, BaseParser
+    JSONParser, FormParser, MultiPartParser
 )
 from reviews.models import Title, Category, Genre
 from api.core.permissions import AdminOnly
+from rest_framework.permissions import AllowAny
 from .serializers import (
     TitleReadSerializer, TitleWriteSerializer,
     CategorySerializer, GenreSerializer,
@@ -55,13 +56,6 @@ class TitleViewSet(viewsets.ModelViewSet):
         return super().partial_update(request, *args, **kwargs)
 
 
-class PlainTextParser(BaseParser):
-    media_type = '*/*'
-
-    def parse(self, stream, media_type=None, parser_context=None):
-        return {}
-
-
 class CategoryViewSet(mixins.ListModelMixin,
                       mixins.CreateModelMixin,
                       mixins.DestroyModelMixin,
@@ -74,7 +68,7 @@ class CategoryViewSet(mixins.ListModelMixin,
     lookup_field = 'slug'
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']
-    parser_classes = [JSONParser, FormParser, MultiPartParser, PlainTextParser]
+    parser_classes = [JSONParser, FormParser, MultiPartParser]
     http_method_names = ['get', 'post', 'delete']
 
     def get_permissions(self):
@@ -83,7 +77,11 @@ class CategoryViewSet(mixins.ListModelMixin,
         return [permissions.AllowAny()]
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(mixins.ListModelMixin,
+                   mixins.CreateModelMixin,
+                   mixins.DestroyModelMixin,
+                   mixins.UpdateModelMixin,
+                   viewsets.GenericViewSet):
     """ViewSet для управления жанрами произведений."""
 
     queryset = Genre.objects.all()
@@ -93,15 +91,12 @@ class GenreViewSet(viewsets.ModelViewSet):
     search_fields = ['name']
 
     def get_permissions(self):
-        if self.action in ['create', 'destroy', 'update', 'partial_update']:
+        if self.action in ['create', 'destroy', 'partial_update', 'update']:
             return [AdminOnly()]
-        return [permissions.AllowAny()]
-
-    def retrieve(self, request, *args, **kwargs):
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return [AllowAny()]
 
     def update(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def partial_update(self, request, *args, **kwargs):
+    def retrieve(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
