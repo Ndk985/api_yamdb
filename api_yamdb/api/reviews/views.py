@@ -17,20 +17,22 @@ class ReviewViewSet(viewsets.ModelViewSet):
         IsAuthenticatedOrReadOnly, IsAuthorOrModeratorOrAdmin
     ]
 
+    def get_title(self):
+        return get_object_or_404(Title, id=self.kwargs['title_id'])
+
     def get_queryset(self):
-        title_id = self.kwargs['title_id']
-        return Review.objects.filter(title_id=title_id)
+        return self.get_title().reviews.all()
 
     def perform_create(self, serializer):
-        title = get_object_or_404(Title, id=self.kwargs['title_id'])
         serializer.save(
             author=self.request.user,
-            title=title
+            title=self.get_title()
         )
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     """ViewSet для управления комментариями к отзывам."""
+
     http_method_names = ['get', 'post', 'patch', 'delete']
     serializer_class = CommentSerializer
     permission_classes = [
