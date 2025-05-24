@@ -61,7 +61,6 @@ class CategoryViewSet(mixins.ListModelMixin,
 class GenreViewSet(mixins.ListModelMixin,
                    mixins.CreateModelMixin,
                    mixins.DestroyModelMixin,
-                   mixins.UpdateModelMixin,
                    viewsets.GenericViewSet):
     """ViewSet для управления жанрами произведений."""
 
@@ -77,4 +76,9 @@ class GenreViewSet(mixins.ListModelMixin,
         return [AllowAny()]
 
     def update(self, request, *args, **kwargs):
+        if request.method == 'PATCH':
+            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return super().update(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
