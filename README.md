@@ -247,6 +247,8 @@ api_yamdb/
 └── README.md           # Документация проекта
 ```
 
-## Автор
+## Команда проекта
 
-@Ndk985
+- [@Ndk985](https://github.com/Ndk985) - Team Lead
+- [@Hasul91](https://github.com/Hasul91) - Backend Developer
+- [sl56789](https://github.com/sl56789) - Backend Developer
